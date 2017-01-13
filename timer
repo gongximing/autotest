@@ -1,0 +1,54 @@
+1、pom文件引入jar包
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.1.6</version>
+        </dependency>
+2、springmvc工程配置文件mvc-dispatcher-servlet.xml配置如下：
+<bean id="mainTaskExecutor_2"
+          class="com.jdpay.pctest.HelloQuartzJob">
+    </bean>
+
+
+    <bean id="mainTaskHandler_2"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="mainTaskExecutor_2" />
+        <property name="targetMethod" value="execute" />
+        <property name="concurrent" value="true" />
+    </bean>
+
+
+    <bean id="mainTaskCronTrigger_2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="mainTaskHandler_2" />
+        <property name="cronExpression" value="30 35 22 * * ?" />
+    </bean>
+    <bean id="mainTaskCronTrigger_3" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="mainTaskHandler_2" />
+        <property name="cronExpression" value="30 30 08 * * ?" />
+    </bean>
+    
+    
+    <!-- 定时任务触发器 -->
+    <bean id="mainTaskScheduler_2"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+            <!--设置多个定时任务-->
+                <ref bean="mainTaskCronTrigger_2" />
+                <ref bean="mainTaskCronTrigger_3" />
+
+            </list>
+        </property>
+        <property name="autoStartup">
+            <value>true</value>
+        </property>
+    </bean>
+3、com.jdpay.pctest.HelloQuartzJob下创建执行类：
+public class HelloQuartzJob {
+
+    public void execute() throws JobExecutionException {
+
+        TestRunner testRunner = new TestRunner();
+        testRunner.runTest();
+    }
+}
